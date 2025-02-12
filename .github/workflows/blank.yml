@@ -1,0 +1,48 @@
+name: Workflow to run scripts
+
+on: 
+  push:
+    branches:
+      - master 
+env:
+  GLOBAL_MESSAGE: "Mensaje a nivel de todo el workflow.."
+
+jobs:
+  run-scripts:
+    runs-on: ubuntu-latest
+    env:
+      JOB_MESSAGE: "Hola JOB.."
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Dar permisos de ejecucion..
+        run: |
+          chmod +x scripts/*.sh
+
+      - name: Ejecutar script de informacion..
+        run: ./scripts/info.sh
+      
+      - name: Ejecutar script de deploy..
+        run: ./scripts/deploy.sh
+
+      - name: Ejecutar script message...
+        run: ./scripts/message.sh
+        env:
+          MENSAJE: "Valor pasado desde el workflow!..."
+          SEGUNDO: "otro valor"
+
+      - name: Pintar variables del workflow...
+        run: echo "$JOB_MESSAGE , $NAME , $GLOBAL_MESSAGE , ${{ vars.API_URL }}"
+        env:
+          NAME: "Cris"
+
+      - name: Valores del workflow...
+        run: |
+          echo "Tipo de evento: ${{ github.event_name }}"
+          echo "Nombre de repositorio: ${{ github.repository }}"
+          echo "Rama: ${{ github.ref }}"
+          echo "Commit HASH: ${{ github.sha }}"
+          echo "Usuario que lanzo el workflow: ${{ github.actor }}"
+          echo "Nro ejecucion workflow: ${{ github.run_number }}"
+          echo "Mensaje de commit: ${{ github.event.head_commit.message }}"
